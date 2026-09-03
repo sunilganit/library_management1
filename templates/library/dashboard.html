@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    📊 Library Dashboard
+</h2>
+
+<div class="row g-3">
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h6>Total Books</h6>
+
+                <h2>{{ total_books }}</h2>
+
+                <a href="{% url 'book_list' %}">
+                    View Books
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h6>Available Books</h6>
+
+                <h2>{{ available_books }}</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h6>Issued Books</h6>
+
+                <h2>{{ issued_books }}</h2>
+
+                <a href="{% url 'issue_list' %}">
+                    View Issues
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h6>Overdue Books</h6>
+
+                <h2>{{ overdue_books }}</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="row mt-4">
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h4>Quick Actions</h4>
+
+                <a
+                    href="{% url 'book_create' %}"
+                    class="btn btn-primary">
+                    Add Book
+                </a>
+
+                <a
+                    href="{% url 'author_create' %}"
+                    class="btn btn-secondary">
+                    Add Author
+                </a>
+
+                <a
+                    href="{% url 'category_create' %}"
+                    class="btn btn-info">
+                    Add Category
+                </a>
+
+                <a
+                    href="{% url 'issue_book' %}"
+                    class="btn btn-success">
+                    Issue Book
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

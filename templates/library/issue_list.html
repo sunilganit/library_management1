@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+
+<h2>📋 Issue Records</h2>
+
+<a
+    href="{% url 'issue_book' %}"
+    class="btn btn-success">
+    Issue Book
+</a>
+
+</div>
+
+
+<table class="table table-bordered table-hover">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Book</th>
+<th>Member</th>
+<th>Issue Date</th>
+<th>Due Date</th>
+<th>Return Date</th>
+<th>Status</th>
+<th>Fine</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+{% for issue in page_obj %}
+
+<tr>
+
+<td>
+{{ issue.book.title }}
+</td>
+
+<td>
+{{ issue.member }}
+</td>
+
+<td>
+{{ issue.issue_date }}
+</td>
+
+<td>
+{{ issue.due_date }}
+</td>
+
+<td>
+{{ issue.return_date|default:"-" }}
+</td>
+
+
+<td>
+
+{% if issue.status == 'issued' %}
+
+{% if issue.due_date < today %}
+
+<span class="badge bg-danger">
+    Overdue
+</span>
+
+{% else %}
+
+<span class="badge bg-warning text-dark">
+    Issued
+</span>
+
+{% endif %}
+
+{% else %}
+
+<span class="badge bg-success">
+    Returned
+</span>
+
+{% endif %}
+
+</td>
+
+
+<td>
+Rs. {{ issue.fine }}
+</td>
+
+
+<td>
+
+{% if issue.status == 'issued' %}
+
+<a
+    href="{% url 'return_book' issue.id %}"
+    class="btn btn-sm btn-success">
+
+    Return
+
+</a>
+
+{% else %}
+
+<span class="text-muted">
+    Completed
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+
+<nav>
+
+<ul class="pagination">
+
+{% if page_obj.has_previous %}
+
+<li class="page-item">
+
+<a
+    class="page-link"
+    href="?page={{ page_obj.previous_page_number }}">
+
+Previous
+
+</a>
+
+</li>
+
+{% endif %}
+
+
+<li class="page-item active">
+
+<span class="page-link">
+
+{{ page_obj.number }}
+
+</span>
+
+</li>
+
+
+{% if page_obj.has_next %}
+
+<li class="page-item">
+
+<a
+    class="page-link"
+    href="?page={{ page_obj.next_page_number }}">
+
+Next
+
+</a>
+
+</li>
+
+{% endif %}
+
+</ul>
+
+</nav>
+
+{% endblock %}

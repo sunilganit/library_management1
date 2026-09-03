@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+
+<h2>✍ Authors</h2>
+
+<a
+    href="{% url 'author_create' %}"
+    class="btn btn-primary">
+    Add Author
+</a>
+
+</div>
+
+
+<table class="table table-bordered">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Name</th>
+<th>Email</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for author in authors %}
+
+<tr>
+
+<td>{{ author.name }}</td>
+
+<td>{{ author.email }}</td>
+
+<td>
+
+<form
+    method="post"
+    action="{% url 'author_delete' author.id %}"
+    style="display:inline">
+
+    {% csrf_token %}
+
+    <button class="btn btn-danger btn-sm">
+        Delete
+    </button>
+
+</form>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

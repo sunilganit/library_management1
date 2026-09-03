@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+
+    <h2>📚 Books</h2>
+
+    <a
+        href="{% url 'book_create' %}"
+        class="btn btn-primary">
+        + Add Book
+    </a>
+
+</div>
+
+
+<form method="get" class="row g-2 mb-4">
+
+    <div class="col-md-5">
+
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            class="form-control"
+            placeholder="Search title, ISBN or author">
+
+    </div>
+
+
+    <div class="col-md-3">
+
+        <select
+            name="category"
+            class="form-select">
+
+            <option value="">
+                All Categories
+            </option>
+
+            {% for category in categories %}
+
+            <option
+                value="{{ category.id }}"
+                {% if selected_category == category.id|stringformat:"s" %}
+                    selected
+                {% endif %}
+            >
+
+                {{ category.name }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+
+    <div class="col-md-2">
+
+        <select
+            name="status"
+            class="form-select">
+
+            <option value="">All Status</option>
+
+            <option
+                value="available"
+                {% if selected_status == 'available' %}
+                    selected
+                {% endif %}
+            >
+                Available
+            </option>
+
+            <option
+                value="issued"
+                {% if selected_status == 'issued' %}
+                    selected
+                {% endif %}
+            >
+                Issued
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="col-md-2">
+
+        <button class="btn btn-dark w-100">
+            Search
+        </button>
+
+    </div>
+
+</form>
+
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Title</th>
+<th>ISBN</th>
+<th>Author</th>
+<th>Category</th>
+<th>Quantity</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for book in page_obj %}
+
+<tr>
+
+<td>{{ book.title }}</td>
+
+<td>{{ book.isbn }}</td>
+
+<td>{{ book.author.name }}</td>
+
+<td>
+    {{ book.category.name|default:"-" }}
+</td>
+
+<td>
+    {{ book.available_quantity }}/{{ book.quantity }}
+</td>
+
+<td>
+
+{% if book.is_available %}
+
+<span class="badge bg-success">
+    Available
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+    Issued
+</span>
+
+{% endif %}
+
+</td>
+
+
+<td>
+
+<a
+    href="{% url 'book_update' book.id %}"
+    class="btn btn-sm btn-warning">
+    Edit
+</a>
+
+<a
+    href="{% url 'book_delete' book.id %}"
+    class="btn btn-sm btn-danger">
+    Delete
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="7"
+    class="text-center">
+
+    No books found.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<nav>
+
+<ul class="pagination">
+
+{% if page_obj.has_previous %}
+
+<li class="page-item">
+
+<a
+    class="page-link"
+    href="?q={{ query }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.previous_page_number }}">
+
+    Previous
+
+</a>
+
+</li>
+
+{% endif %}
+
+
+<li class="page-item active">
+
+<span class="page-link">
+
+Page {{ page_obj.number }}
+of {{ page_obj.paginator.num_pages }}
+
+</span>
+
+</li>
+
+
+{% if page_obj.has_next %}
+
+<li class="page-item">
+
+<a
+    class="page-link"
+    href="?q={{ query }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.next_page_number }}">
+
+    Next
+
+</a>
+
+</li>
+
+{% endif %}
+
+</ul>
+
+</nav>
+
+{% endblock %}

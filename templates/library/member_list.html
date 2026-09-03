@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+
+<h2>👥 Members</h2>
+
+<a
+    href="{% url 'member_create' %}"
+    class="btn btn-primary">
+    Add Member
+</a>
+
+</div>
+
+
+<table class="table table-bordered">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Username</th>
+<th>Name</th>
+<th>Email</th>
+<th>Phone</th>
+<th>Joined</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+{% for member in members %}
+
+<tr>
+
+<td>{{ member.user.username }}</td>
+
+<td>
+{{ member.user.get_full_name }}
+</td>
+
+<td>
+{{ member.user.email }}
+</td>
+
+<td>
+{{ member.phone }}
+</td>
+
+<td>
+{{ member.joined_date }}
+</td>
+
+<td>
+
+<form
+    method="post"
+    action="{% url 'member_delete' member.id %}">
+
+{% csrf_token %}
+
+<button class="btn btn-danger btn-sm">
+    Delete
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}
