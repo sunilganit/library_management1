@@ -84,4 +84,10 @@ urlpatterns = [
         views.return_book,
         name='return_book'
     ),
+
+    # Quick create (AJAX, used by modals)
+    path('api/quick/author/', views.author_quick_create, name='author_quick_create'),
+    path('api/quick/category/', views.category_quick_create, name='category_quick_create'),
+    path('api/quick/user/', views.user_quick_create, name='user_quick_create'),
+    path('api/quick/member/', views.member_quick_create, name='member_quick_create'),
 ]

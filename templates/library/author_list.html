@@ -1,67 +1,14 @@
 {% extends 'base.html' %}
-
+{% block title %}Authors · Athenaeum{% endblock %}
+{% block header %}Authors ✍️{% endblock %}
 {% block content %}
-
-<div class="d-flex justify-content-between mb-3">
-
-<h2>✍ Authors</h2>
-
-<a
-    href="{% url 'author_create' %}"
-    class="btn btn-primary">
-    Add Author
-</a>
-
-</div>
-
-
-<table class="table table-bordered">
-
-<thead class="table-dark">
-
-<tr>
-
-<th>Name</th>
-<th>Email</th>
-<th>Action</th>
-
-</tr>
-
-</thead>
-
+<div class="page-head"><div><h2>Authors</h2><p>Manage writers in your collection</p></div><a href="{% url 'author_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Add Author</a></div>
+<div class="card card-modern overflow-hidden"><div class="table-responsive"><table class="table table-modern">
+<thead><tr><th>Author</th><th>Email</th><th class="text-end">Action</th></tr></thead>
 <tbody>
-
 {% for author in authors %}
-
-<tr>
-
-<td>{{ author.name }}</td>
-
-<td>{{ author.email }}</td>
-
-<td>
-
-<form
-    method="post"
-    action="{% url 'author_delete' author.id %}"
-    style="display:inline">
-
-    {% csrf_token %}
-
-    <button class="btn btn-danger btn-sm">
-        Delete
-    </button>
-
-</form>
-
-</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
+<tr><td><div class="d-flex align-items-center gap-2"><span class="rounded-circle text-white d-grid fw-bold" style="width:36px;height:36px;place-items:center;background:linear-gradient(135deg,#f59e0b,#ef4444);display:grid">{{ author.name|slice:":1"|upper }}</span><span class="fw-semibold">{{ author.name }}</span></div></td><td class="text-muted">{{ author.email|default:"—" }}</td>
+<td class="text-end"><form method="post" action="{% url 'author_delete' author.id %}" style="display:inline" onsubmit="return confirm('Delete {{ author.name }}?')">{% csrf_token %}<button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button></form></td></tr>
+{% empty %}<tr><td colspan="3" class="text-center py-5 text-muted"><i class="bi bi-pen fs-1 d-block mb-2"></i>No authors yet.</td></tr>{% endfor %}
+</tbody></table></div></div>
 {% endblock %}

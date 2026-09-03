@@ -33,6 +33,8 @@ class BookForm(forms.ModelForm):
         ]
 
         widgets = {
+            'author': forms.Select(attrs={'class': 'form-select'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
             'description': forms.Textarea(attrs={'rows': 4}),
         }
 
@@ -48,5 +50,6 @@ class MemberForm(forms.ModelForm):
         ]
 
         widgets = {
+            'user': forms.Select(attrs={'class': 'form-select'}),
             'address': forms.Textarea(attrs={'rows': 3}),
         }

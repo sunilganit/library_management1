@@ -2,6 +2,8 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.core.paginator import Paginator
@@ -446,6 +448,96 @@ def issue_list(request):
             'current_datetime': timezone.localtime()
         },
     )
+
+
+# =========================
+# QUICK CREATE (AJAX)
+# =========================
+
+@login_required
+def author_quick_create(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    form = AuthorForm(request.POST)
+    if form.is_valid():
+        author = form.save()
+        return JsonResponse({'id': author.id, 'name': author.name})
+    return JsonResponse({'errors': form.errors}, status=400)
+
+
+@login_required
+def category_quick_create(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    form = CategoryForm(request.POST)
+    if form.is_valid():
+        category = form.save()
+        return JsonResponse({'id': category.id, 'name': category.name})
+    return JsonResponse({'errors': form.errors}, status=400)
+
+
+@login_required
+def user_quick_create(request):
+    """Create a bare auth User for the Member form's user dropdown."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    username = (request.POST.get('username') or '').strip()
+    first_name = (request.POST.get('first_name') or '').strip()
+    last_name = (request.POST.get('last_name') or '').strip()
+    email = (request.POST.get('email') or '').strip()
+    if not username:
+        return JsonResponse(
+            {'errors': {'username': ['Username is required.']}}, status=400
+        )
+    if User.objects.filter(username=username).exists():
+        return JsonResponse(
+            {'errors': {'username': ['Username already taken.']}}, status=400
+        )
+    user = User(username=username, first_name=first_name,
+                last_name=last_name, email=email)
+    user.set_unusable_password()
+    user.save()
+    label = user.get_full_name() or user.username
+    return JsonResponse({'id': user.id, 'name': label})
+
+
+@login_required
+def member_quick_create(request):
+    """Create User + Member in one step (used on Issue page)."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    username = (request.POST.get('username') or '').strip()
+    first_name = (request.POST.get('first_name') or '').strip()
+    last_name = (request.POST.get('last_name') or '').strip()
+    email = (request.POST.get('email') or '').strip()
+    phone = (request.POST.get('phone') or '').strip()
+    if not username:
+        return JsonResponse(
+            {'errors': {'username': ['Username is required.']}}, status=400
+        )
+    if not phone:
+        return JsonResponse(
+            {'errors': {'phone': ['Phone is required.']}}, status=400
+        )
+    user, created = User.objects.get_or_create(
+        username=username,
+        defaults={'first_name': first_name,
+                  'last_name': last_name, 'email': email},
+    )
+    if hasattr(user, 'member_profile'):
+        return JsonResponse(
+            {'errors': {'username': ['This user is already a member.']}},
+            status=400,
+        )
+    if created:
+        user.set_unusable_password()
+        user.save()
+    member = Member.objects.create(
+        user=user, phone=phone,
+        address=request.POST.get('address', ''),
+    )
+    label = user.get_full_name() or user.username
+    return JsonResponse({'id': member.id, 'name': f'{label} (@{user.username})'})
 
 
 # =========================

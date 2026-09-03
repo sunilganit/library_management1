@@ -1,131 +1,84 @@
 {% extends 'base.html' %}
-
+{% block title %}Dashboard · Athenaeum{% endblock %}
+{% block header %}Library Dashboard 📊{% endblock %}
 {% block content %}
-
-<h2 class="mb-4">
-    📊 Library Dashboard
-</h2>
+<div class="page-head">
+    <div>
+        <h2>At a glance</h2>
+        <p>Track inventory, circulation and overdue items in real time.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'book_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Add Book</a>
+        <a href="{% url 'issue_book' %}" class="btn btn-dark"><i class="bi bi-bookmark-plus me-1"></i> Issue Book</a>
+    </div>
+</div>
 
 <div class="row g-3">
-
-    <div class="col-md-3">
-
-        <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h6>Total Books</h6>
-
-                <h2>{{ total_books }}</h2>
-
-                <a href="{% url 'book_list' %}">
-                    View Books
-                </a>
-
+    <div class="col-6 col-xl-3">
+        <div class="card card-modern stat-card"><div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+                <span class="stat-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="bi bi-journal-bookmark"></i></span>
+                <div><div class="text-muted small fw-semibold">Total Books</div><h2 class="fw-bold mb-0">{{ total_books }}</h2></div>
             </div>
-
-        </div>
-
+            <a href="{% url 'book_list' %}" class="btn btn-light btn-sm mt-3 w-100">View Books <i class="bi bi-arrow-right ms-1"></i></a>
+        </div></div>
     </div>
-
-
-    <div class="col-md-3">
-
-        <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h6>Available Books</h6>
-
-                <h2>{{ available_books }}</h2>
-
+    <div class="col-6 col-xl-3">
+        <div class="card card-modern stat-card"><div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+                <span class="stat-icon" style="background:linear-gradient(135deg,#10b981,#34d399)"><i class="bi bi-check-circle"></i></span>
+                <div><div class="text-muted small fw-semibold">Available</div><h2 class="fw-bold mb-0">{{ available_books }}</h2></div>
             </div>
-
-        </div>
-
+            <div class="progress mt-3" style="height:6px">{% if total_books %}<div class="progress-bar bg-success" style="width:{% widthratio available_books total_books 100 %}%"></div>{% endif %}</div>
+            <div class="small text-muted mt-2">Ready to borrow</div>
+        </div></div>
     </div>
-
-
-    <div class="col-md-3">
-
-        <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h6>Issued Books</h6>
-
-                <h2>{{ issued_books }}</h2>
-
-                <a href="{% url 'issue_list' %}">
-                    View Issues
-                </a>
-
+    <div class="col-6 col-xl-3">
+        <div class="card card-modern stat-card"><div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+                <span class="stat-icon" style="background:linear-gradient(135deg,#f59e0b,#f97316)"><i class="bi bi-arrow-left-right"></i></span>
+                <div><div class="text-muted small fw-semibold">Issued</div><h2 class="fw-bold mb-0">{{ issued_books }}</h2></div>
             </div>
-
-        </div>
-
+            <a href="{% url 'issue_list' %}" class="btn btn-light btn-sm mt-3 w-100">View Issues <i class="bi bi-arrow-right ms-1"></i></a>
+        </div></div>
     </div>
-
-
-    <div class="col-md-3">
-
-        <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h6>Overdue Books</h6>
-
-                <h2>{{ overdue_books }}</h2>
-
+    <div class="col-6 col-xl-3">
+        <div class="card card-modern stat-card" style="border-left:4px solid #ef4444"><div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+                <span class="stat-icon" style="background:linear-gradient(135deg,#ef4444,#f43f5e)"><i class="bi bi-alarm"></i></span>
+                <div><div class="text-muted small fw-semibold">Overdue</div><h2 class="fw-bold mb-0">{{ overdue_books }}</h2></div>
             </div>
-
-        </div>
-
+            <div class="small mt-3 {% if overdue_books %}text-danger fw-bold{% else %}text-success fw-semibold{% endif %}">{% if overdue_books %}<i class="bi bi-exclamation-triangle me-1"></i>Needs attention{% else %}<i class="bi bi-check2-circle me-1"></i>All clear{% endif %}</div>
+        </div></div>
     </div>
-
 </div>
 
-
-<div class="row mt-4">
-
-    <div class="col-md-6">
-
-        <div class="card">
-
-            <div class="card-body">
-
-                <h4>Quick Actions</h4>
-
-                <a
-                    href="{% url 'book_create' %}"
-                    class="btn btn-primary">
-                    Add Book
-                </a>
-
-                <a
-                    href="{% url 'author_create' %}"
-                    class="btn btn-secondary">
-                    Add Author
-                </a>
-
-                <a
-                    href="{% url 'category_create' %}"
-                    class="btn btn-info">
-                    Add Category
-                </a>
-
-                <a
-                    href="{% url 'issue_book' %}"
-                    class="btn btn-success">
-                    Issue Book
-                </a>
-
+<div class="row g-3 mt-1">
+    <div class="col-lg-7">
+        <div class="card card-modern"><div class="card-body p-4">
+            <h5 class="fw-bold mb-1">Quick Actions</h5>
+            <p class="text-muted small mb-3">Common librarian workflows, one click away.</p>
+            <div class="row g-2">
+                <div class="col-6"><a href="{% url 'book_create' %}" class="btn btn-light w-100 border py-3"><i class="bi bi-plus-circle-fill text-primary fs-5 d-block mb-1"></i>Add Book</a></div>
+                <div class="col-6"><a href="{% url 'issue_book' %}" class="btn btn-light w-100 border py-3"><i class="bi bi-bookmark-plus-fill text-success fs-5 d-block mb-1"></i>Issue Book</a></div>
+                <div class="col-4"><a href="{% url 'author_create' %}" class="btn btn-light w-100 border py-3"><i class="bi bi-pen-fill text-warning fs-5 d-block mb-1"></i>Author</a></div>
+                <div class="col-4"><a href="{% url 'category_create' %}" class="btn btn-light w-100 border py-3"><i class="bi bi-tags-fill text-info fs-5 d-block mb-1"></i>Category</a></div>
+                <div class="col-4"><a href="{% url 'member_create' %}" class="btn btn-light w-100 border py-3"><i class="bi bi-person-plus-fill text-secondary fs-5 d-block mb-1"></i>Member</a></div>
             </div>
-
-        </div>
-
+        </div></div>
     </div>
-
+    <div class="col-lg-5">
+        <div class="card card-modern h-100" style="background:linear-gradient(135deg,#1e1b4b,#4c1d95);color:#fff"><div class="card-body p-4">
+            <span class="badge bg-white bg-opacity-25 mb-2"><i class="bi bi-lightbulb me-1"></i>Pro tip</span>
+            <h5 class="fw-bold">Keep circulation healthy</h5>
+            <p class="small mb-3" style="color:#c4b5fd">Books loan for 14 days with Rs. 10/day late fine. Follow up on overdue items from the circulation desk.</p>
+            <div class="row g-2 text-center">
+                <div class="col-4"><div class="rounded-3 bg-white bg-opacity-10 p-2"><div class="fw-bold">{{ total_authors }}</div><div class="small" style="color:#c4b5fd">Authors</div></div></div>
+                <div class="col-4"><div class="rounded-3 bg-white bg-opacity-10 p-2"><div class="fw-bold">{{ total_categories }}</div><div class="small" style="color:#c4b5fd">Categories</div></div></div>
+                <div class="col-4"><div class="rounded-3 bg-white bg-opacity-10 p-2"><div class="fw-bold">{{ total_members }}</div><div class="small" style="color:#c4b5fd">Members</div></div></div>
+            </div>
+            <a href="{% url 'member_list' %}" class="btn btn-light btn-sm mt-3 w-100">Manage Members</a>
+        </div></div>
+    </div>
 </div>
-
 {% endblock %}

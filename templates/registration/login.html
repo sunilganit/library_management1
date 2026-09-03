@@ -1,41 +1,23 @@
 {% extends 'base.html' %}
-
-{% block content %}
-
-<div class="row justify-content-center">
-
-<div class="col-md-5">
-
-<div class="card shadow">
-
-<div class="card-body">
-
-<h3 class="text-center mb-4">
-    🔐 Library Login
-</h3>
-
-
-<form method="post">
-
-{% csrf_token %}
-
-{{ form.as_p }}
-
-<button
-    class="btn btn-primary w-100">
-
-    Login
-
-</button>
-
-</form>
-
+{% block title %}Login · Athenaeum{% endblock %}
+{% block public_content %}
+<div class="login-bg d-flex align-items-center justify-content-center py-5" style="margin:-1.75rem;border-radius:1.2rem">
+<div class="container" style="max-width:440px">
+    <div class="text-center mb-4">
+        <span class="d-inline-grid place-items-center rounded-4 mb-3" style="width:64px;height:64px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-size:1.8rem;box-shadow:0 12px 30px rgba(99,102,241,.5);display:inline-grid;place-items:center"><i class="bi bi-book-half"></i></span>
+        <h2 class="fw-bold text-white mb-1">Welcome back</h2>
+        <p style="color:#c4b5fd">Sign in to manage your library</p>
+    </div>
+    <div class="card card-modern border-0"><div class="card-body p-4">
+        <h5 class="fw-bold mb-1"><i class="bi bi-shield-lock-fill text-primary me-2"></i>Library Login</h5>
+        <p class="text-muted small mb-3">Use your librarian credentials to continue.</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary w-100 py-2 mt-2">Sign In <i class="bi bi-arrow-right ms-1"></i></button>
+        </form>
+        <p class="text-center text-muted small mt-3 mb-0"><i class="bi bi-info-circle me-1"></i>Contact admin if you forgot your password.</p>
+    </div></div>
 </div>
-
 </div>
-
-</div>
-
-</div>
-
 {% endblock %}

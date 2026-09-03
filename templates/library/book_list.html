@@ -1,256 +1,44 @@
 {% extends 'base.html' %}
-
+{% block title %}Books · Athenaeum{% endblock %}
+{% block header %}Books 📚{% endblock %}
 {% block content %}
-
-<div class="d-flex justify-content-between mb-3">
-
-    <h2>📚 Books</h2>
-
-    <a
-        href="{% url 'book_create' %}"
-        class="btn btn-primary">
-        + Add Book
-    </a>
-
+<div class="page-head">
+    <div><h2>Catalog</h2><p>{{ page_obj.paginator.count }} book{{ page_obj.paginator.count|pluralize }} in collection</p></div>
+    <a href="{% url 'book_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Add Book</a>
 </div>
-
-
-<form method="get" class="row g-2 mb-4">
-
-    <div class="col-md-5">
-
-        <input
-            type="text"
-            name="q"
-            value="{{ query }}"
-            class="form-control"
-            placeholder="Search title, ISBN or author">
-
-    </div>
-
-
-    <div class="col-md-3">
-
-        <select
-            name="category"
-            class="form-select">
-
-            <option value="">
-                All Categories
-            </option>
-
-            {% for category in categories %}
-
-            <option
-                value="{{ category.id }}"
-                {% if selected_category == category.id|stringformat:"s" %}
-                    selected
-                {% endif %}
-            >
-
-                {{ category.name }}
-
-            </option>
-
-            {% endfor %}
-
-        </select>
-
-    </div>
-
-
-    <div class="col-md-2">
-
-        <select
-            name="status"
-            class="form-select">
-
-            <option value="">All Status</option>
-
-            <option
-                value="available"
-                {% if selected_status == 'available' %}
-                    selected
-                {% endif %}
-            >
-                Available
-            </option>
-
-            <option
-                value="issued"
-                {% if selected_status == 'issued' %}
-                    selected
-                {% endif %}
-            >
-                Issued
-            </option>
-
-        </select>
-
-    </div>
-
-
-    <div class="col-md-2">
-
-        <button class="btn btn-dark w-100">
-            Search
-        </button>
-
-    </div>
-
+<div class="card card-modern mb-3"><div class="card-body">
+<form method="get" class="row g-2">
+    <div class="col-md-5"><div class="input-group"><span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span><input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search title, ISBN or author"></div></div>
+    <div class="col-md-3"><select name="category" class="form-select"><option value="">All Categories</option>{% for category in categories %}<option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="status" class="form-select"><option value="">All Status</option><option value="available" {% if selected_status == 'available' %}selected{% endif %}>Available</option><option value="issued" {% if selected_status == 'issued' %}selected{% endif %}>Issued</option></select></div>
+    <div class="col-md-2 d-flex gap-2"><button class="btn btn-dark flex-grow-1">Search</button>{% if query or selected_category or selected_status %}<a href="{% url 'book_list' %}" class="btn btn-light border" title="Clear"><i class="bi bi-x-lg"></i></a>{% endif %}</div>
 </form>
-
-
-<div class="table-responsive">
-
-<table class="table table-bordered table-hover">
-
-<thead class="table-dark">
-
-<tr>
-
-<th>Title</th>
-<th>ISBN</th>
-<th>Author</th>
-<th>Category</th>
-<th>Quantity</th>
-<th>Status</th>
-<th>Action</th>
-
-</tr>
-
-</thead>
-
+</div></div>
+<div class="card card-modern overflow-hidden">
+<div class="table-responsive"><table class="table table-modern align-middle">
+<thead><tr><th>Title</th><th>ISBN</th><th>Author</th><th>Category</th><th>Stock</th><th>Status</th><th class="text-end">Action</th></tr></thead>
 <tbody>
-
 {% for book in page_obj %}
-
 <tr>
-
-<td>{{ book.title }}</td>
-
-<td>{{ book.isbn }}</td>
-
+<td><div class="d-flex align-items-center gap-2"><span class="rounded-3 d-grid" style="width:36px;height:36px;place-items:center;background:#eef2ff;color:#4f46e5;display:grid"><i class="bi bi-book"></i></span><span class="fw-semibold">{{ book.title }}</span></div></td>
+<td class="text-muted">{{ book.isbn }}</td>
 <td>{{ book.author.name }}</td>
-
-<td>
-    {{ book.category.name|default:"-" }}
-</td>
-
-<td>
-    {{ book.available_quantity }}/{{ book.quantity }}
-</td>
-
-<td>
-
-{% if book.is_available %}
-
-<span class="badge bg-success">
-    Available
-</span>
-
-{% else %}
-
-<span class="badge bg-danger">
-    Issued
-</span>
-
-{% endif %}
-
-</td>
-
-
-<td>
-
-<a
-    href="{% url 'book_update' book.id %}"
-    class="btn btn-sm btn-warning">
-    Edit
-</a>
-
-<a
-    href="{% url 'book_delete' book.id %}"
-    class="btn btn-sm btn-danger">
-    Delete
-</a>
-
-</td>
-
+<td><span class="badge bg-light text-dark border">{{ book.category.name|default:"-" }}</span></td>
+<td><span class="fw-semibold">{{ book.available_quantity }}</span><span class="text-muted">/{{ book.quantity }}</span></td>
+<td>{% if book.is_available %}<span class="badge badge-soft bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Available</span>{% else %}<span class="badge badge-soft bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-x-circle me-1"></i>Issued</span>{% endif %}</td>
+<td class="text-end text-nowrap"><a href="{% url 'book_update' book.id %}" class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i> Edit</a> <a href="{% url 'book_delete' book.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a></td>
 </tr>
-
 {% empty %}
-
-<tr>
-
-<td colspan="7"
-    class="text-center">
-
-    No books found.
-
-</td>
-
-</tr>
-
+<tr><td colspan="7" class="text-center py-5"><div class="text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i>No books found. Try a different search.</div></td></tr>
 {% endfor %}
-
 </tbody>
-
-</table>
-
+</table></div>
 </div>
-
-
-<nav>
-
-<ul class="pagination">
-
-{% if page_obj.has_previous %}
-
-<li class="page-item">
-
-<a
-    class="page-link"
-    href="?q={{ query }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.previous_page_number }}">
-
-    Previous
-
-</a>
-
-</li>
-
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="mt-3 d-flex justify-content-center"><ul class="pagination mb-0">
+{% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?q={{ query }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>{% endif %}
+<li class="page-item active"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+{% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?q={{ query }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a></li>{% endif %}
+</ul></nav>
 {% endif %}
-
-
-<li class="page-item active">
-
-<span class="page-link">
-
-Page {{ page_obj.number }}
-of {{ page_obj.paginator.num_pages }}
-
-</span>
-
-</li>
-
-
-{% if page_obj.has_next %}
-
-<li class="page-item">
-
-<a
-    class="page-link"
-    href="?q={{ query }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.next_page_number }}">
-
-    Next
-
-</a>
-
-</li>
-
-{% endif %}
-
-</ul>
-
-</nav>
-
 {% endblock %}

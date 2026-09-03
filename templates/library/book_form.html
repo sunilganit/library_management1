@@ -1,32 +1,90 @@
 {% extends 'base.html' %}
-
+{% block title %}{% if book %}Edit Book{% else %}Add Book{% endif %} · Athenaeum{% endblock %}
+{% block header %}{% if book %}Edit Book ✏️{% else %}Add Book ➕{% endif %}{% endblock %}
 {% block content %}
-
-<h2>
-    {% if book %}
-        ✏️ Edit Book
-    {% else %}
-        ➕ Add Book
-    {% endif %}
-</h2>
-
-
-<form method="post" class="mt-4">
-
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button class="btn btn-primary">
-        Save
-    </button>
-
-    <a
-        href="{% url 'book_list' %}"
-        class="btn btn-secondary">
-        Cancel
-    </a>
-
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card card-modern"><div class="card-body p-4">
+<h4 class="fw-bold mb-1">{% if book %}Edit "{{ book.title|truncatechars:30 }}"{% else %}New Book{% endif %}</h4>
+<p class="text-muted small mb-3">Fill in the bibliographic details below. Missing an author or category? Add it without leaving this page.</p>
+<form method="post" id="book-form">{% csrf_token %}
+{{ form.non_field_errors }}
+<p>{{ form.title.label_tag }}{{ form.title }}{{ form.title.errors }}</p>
+<p>{{ form.isbn.label_tag }}{{ form.isbn }}{{ form.isbn.errors }}</p>
+<div class="mb-2">
+  <div class="d-flex align-items-center justify-content-between">
+    <label class="fw-semibold small text-dark mb-1" for="{{ form.author.id_for_label }}">Author</label>
+    <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#quickAuthorModal"><i class="bi bi-plus-lg me-1"></i>Quick add</button>
+  </div>
+  {{ form.author }}{{ form.author.errors }}
+</div>
+<div class="mb-2">
+  <div class="d-flex align-items-center justify-content-between">
+    <label class="fw-semibold small text-dark mb-1" for="{{ form.category.id_for_label }}">Category</label>
+    <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#quickCategoryModal"><i class="bi bi-plus-lg me-1"></i>Quick add</button>
+  </div>
+  {{ form.category }}{{ form.category.errors }}
+</div>
+<p>{{ form.publisher.label_tag }}{{ form.publisher }}{{ form.publisher.errors }}</p>
+<p>{{ form.publication_year.label_tag }}{{ form.publication_year }}{{ form.publication_year.errors }}</p>
+<p>{{ form.quantity.label_tag }}{{ form.quantity }}{{ form.quantity.errors }}</p>
+<p>{{ form.available_quantity.label_tag }}{{ form.available_quantity }}{{ form.available_quantity.errors }}</p>
+<p>{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</p>
+<div class="d-flex gap-2 mt-3"><button class="btn btn-primary flex-grow-1"><i class="bi bi-check-lg me-1"></i> Save Book</button><a href="{% url 'book_list' %}" class="btn btn-light border">Cancel</a></div>
 </form>
+</div></div>
+</div></div>
 
+<!-- Quick add Author -->
+<div class="modal fade" id="quickAuthorModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content" style="border-radius:1rem">
+<div class="modal-header"><h5 class="modal-title fw-bold"><i class="bi bi-pen-fill text-warning me-2"></i>Quick add author</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+<form id="quick-author-form">
+<div class="modal-body">
+  <div class="alert alert-danger d-none" id="qa-error"></div>
+  <div class="mb-2"><label class="form-label fw-semibold">Name *</label><input name="name" class="form-control" required maxlength="150"></div>
+  <div class="mb-2"><label class="form-label fw-semibold">Email</label><input name="email" type="email" class="form-control"></div>
+  <div class="mb-0"><label class="form-label fw-semibold">Biography</label><textarea name="biography" class="form-control" rows="3"></textarea></div>
+</div>
+<div class="modal-footer"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="qa-submit">Add Author</button></div>
+</form>
+</div></div></div>
+
+<!-- Quick add Category -->
+<div class="modal fade" id="quickCategoryModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content" style="border-radius:1rem">
+<div class="modal-header"><h5 class="modal-title fw-bold"><i class="bi bi-tags-fill text-info me-2"></i>Quick add category</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+<form id="quick-category-form">
+<div class="modal-body">
+  <div class="alert alert-danger d-none" id="qc-error"></div>
+  <div class="mb-2"><label class="form-label fw-semibold">Name *</label><input name="name" class="form-control" required maxlength="100"></div>
+  <div class="mb-0"><label class="form-label fw-semibold">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+</div>
+<div class="modal-footer"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" id="qc-submit">Add Category</button></div>
+</form>
+</div></div></div>
+
+<script>
+function getCookie(name){const v=document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith(name+'='));return v?decodeURIComponent(v.split('=')[1]):'';}
+async function quickPost(url, form, errEl){
+  const err=document.querySelector(errEl); err.classList.add('d-none'); err.textContent='';
+  const res=await fetch(url,{method:'POST',headers:{'X-CSRFToken':getCookie('csrftoken')},body:new FormData(form)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok){ err.textContent=Object.entries(data.errors||{error:data.error||'Could not save.'}).map(([k,v])=>k+': '+[].concat(v).join(' ')).join(' | '); err.classList.remove('d-none'); return null; }
+  return data;
+}
+document.getElementById('quick-author-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const data=await quickPost("{% url 'author_quick_create' %}", e.target, '#qa-error');
+  if(!data) return;
+  const sel=document.getElementById('{{ form.author.id_for_label }}')||document.getElementById('id_author');
+  if(sel){ const o=document.createElement('option'); o.value=data.id; o.textContent=data.name; sel.appendChild(o); sel.value=data.id; }
+  bootstrap.Modal.getInstance(document.getElementById('quickAuthorModal')).hide(); e.target.reset();
+});
+document.getElementById('quick-category-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const data=await quickPost("{% url 'category_quick_create' %}", e.target, '#qc-error');
+  if(!data) return;
+  const sel=document.getElementById('{{ form.category.id_for_label }}')||document.getElementById('id_category');
+  if(sel){ const o=document.createElement('option'); o.value=data.id; o.textContent=data.name; sel.appendChild(o); sel.value=data.id; }
+  bootstrap.Modal.getInstance(document.getElementById('quickCategoryModal')).hide(); e.target.reset();
+});
+</script>
 {% endblock %}

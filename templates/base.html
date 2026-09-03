@@ -1,92 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Library Management System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 264px;
+            --bg: #eef2f7;
+            --card-radius: 1.1rem;
+            --primary: #4f46e5;
+            --primary-2: #7c3aed;
+        }
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); color: #0f172a; min-height: 100vh; }
+        .app { display: flex; min-height: 100vh; }
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+            color: #cbd5e1;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+        }
+        .brand {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .5rem .75rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            margin-bottom: 1rem;
+            text-decoration: none;
+        }
+        .brand-mark {
+            width: 44px; height: 44px; border-radius: 14px;
+            display: grid; place-items: center;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: #fff; font-size: 1.4rem;
+            box-shadow: 0 8px 20px rgba(99,102,241,.4);
+        }
+        .brand-name { color: #fff; font-weight: 800; line-height: 1.1; }
+        .brand-name small { display: block; color: #a5b4fc; font-weight: 500; font-size: .75rem; letter-spacing: .04em; }
+        .nav-label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: #818cf8; padding: .75rem .75rem .35rem; font-weight: 700; }
+        .side-link {
+            display: flex; align-items: center; gap: .7rem;
+            color: #cbd5e1; text-decoration: none;
+            padding: .65rem .8rem; border-radius: .8rem;
+            font-weight: 500; font-size: .92rem;
+            transition: all .18s ease;
+            margin-bottom: 2px;
+        }
+        .side-link i { font-size: 1.05rem; width: 22px; text-align: center; opacity: .9; }
+        .side-link:hover { background: rgba(255,255,255,.08); color: #fff; transform: translateX(2px); }
+        .side-link.active { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; box-shadow: 0 6px 18px rgba(99,102,241,.45); }
+        .sidebar-footer { margin-top: auto; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 1rem; padding: .9rem; }
+        .sidebar-footer .avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg,#22d3ee,#6366f1); display: grid; place-items: center; color: #fff; font-weight: 700; }
 
-    <title>Library Management System</title>
+        /* Main */
+        .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .topbar {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(255,255,255,.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .topbar-inner { display: flex; align-items: center; gap: 1rem; padding: .85rem 1.75rem; }
+        .page-title { font-weight: 800; font-size: 1.15rem; margin: 0; }
+        .page-sub { color: #64748b; font-size: .85rem; margin: 0; }
+        .content-wrap { padding: 1.75rem; max-width: 1220px; width: 100%; margin: 0 auto; }
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+        /* Cards / components */
+        .card-modern { border: 0; border-radius: var(--card-radius); box-shadow: 0 1px 3px rgba(15,23,42,.06), 0 10px 30px rgba(15,23,42,.06); }
+        .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .page-head h2 { font-weight: 800; letter-spacing: -.02em; margin: 0; }
+        .page-head p { color: #64748b; margin: .25rem 0 0; font-size: .9rem; }
+        .btn { border-radius: .75rem; font-weight: 600; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); border: 0; box-shadow: 0 6px 16px rgba(79,70,229,.35); }
+        .btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .table-modern { margin: 0; font-size: .92rem; }
+        .table-modern thead th { background: #f8fafc; color: #475569; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; border: 0; padding: .9rem 1rem; white-space: nowrap; }
+        .table-modern tbody td { padding: .9rem 1rem; vertical-align: middle; border-top: 1px solid #f1f5f9; }
+        .table-modern tbody tr:hover { background: #f8fafc; }
+        .badge-soft { border-radius: 999px; padding: .35em .75em; font-weight: 600; font-size: .75rem; }
+        .form-control { border-radius: .8rem; border: 1.5px solid #e2e8f0; padding: .65rem .9rem; font-size: .92rem; }
+        .form-control:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
+        /* Modern selects — applies to .form-select AND raw Django <select> widgets */
+        .form-select, form select {
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            width: 100%;
+            border-radius: .8rem; border: 1.5px solid #e2e8f0;
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right .9rem center; background-size: 15px;
+            padding: .65rem 2.6rem .65rem .9rem;
+            font-size: .92rem; font-weight: 500; color: #0f172a; line-height: 1.5;
+            cursor: pointer; box-shadow: 0 1px 2px rgba(15,23,42,.05);
+            transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+            text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
+        }
+        .form-select:hover, form select:hover { border-color: #a5b4fc; background-color: #fbfbff; }
+        .form-select:focus, form select:focus { border-color: #6366f1; background-color: #fff; outline: 0; box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
+        .form-select:disabled, form select:disabled { background-color: #f1f5f9; color: #94a3b8; cursor: not-allowed; opacity: 1; }
+        .form-select option, form select option { background: #fff; color: #0f172a; font-weight: 500; font-size: .92rem; padding: .55rem .8rem; }
+        .form-select option:checked, form select option:checked { background: linear-gradient(135deg, #eef2ff, #f5f3ff); color: #4338ca; font-weight: 700; }
+        select:-moz-focusring { color: transparent; text-shadow: 0 0 0 #0f172a; }
+        select::-ms-expand { display: none; }
+        form p label { font-weight: 600; font-size: .85rem; color: #334155; display: block; margin-bottom: .35rem; }
+        form p input, form p textarea { display: block; width: 100%; border-radius: .8rem; border: 1.5px solid #e2e8f0; padding: .65rem .9rem; font-size: .92rem; background: #fff; }
+        form p input:focus, form p textarea:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
+        form p .helptext, form ul.errorlist { font-size: .8rem; }
+        form ul.errorlist { color: #dc2626; list-style: none; padding: 0; margin: .3rem 0 0; font-weight: 600; }
+        .stat-card { border: 0; border-radius: 1.2rem; overflow: hidden; position: relative; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; color: #fff; font-size: 1.3rem; }
+        .pagination .page-link { border-radius: .7rem; margin: 0 2px; border: 1px solid #e2e8f0; color: #334155; font-weight: 600; }
+        .pagination .page-item.active .page-link { background: linear-gradient(135deg,#4f46e5,#7c3aed); border: 0; }
 
+        /* Mobile nav */
+        .mobile-nav { display: none; gap: .5rem; overflow-x: auto; padding: .6rem 1rem; background: #0f172a; }
+        .mobile-nav a { color: #cbd5e1; text-decoration: none; font-size: .85rem; font-weight: 600; padding: .45rem .8rem; border-radius: 999px; background: rgba(255,255,255,.08); white-space: nowrap; }
+        .mobile-nav a.active { background: #6366f1; color: #fff; }
+        @media (max-width: 991.98px) {
+            .sidebar { display: none; }
+            .mobile-nav { display: flex; }
+            .content-wrap { padding: 1.1rem; }
+        }
+        /* Login */
+        .login-bg { background: radial-gradient(1000px 500px at 10% 10%, #a5b4fc 0%, transparent 60%), radial-gradient(900px 500px at 90% 20%, #f0abfc 0%, transparent 55%), linear-gradient(135deg, #0f172a, #312e81); min-height: 100vh; }
+    </style>
 </head>
-
 <body>
-
-<nav class="navbar navbar-dark bg-dark navbar-expand-lg">
-
-    <div class="container">
-
-        <a class="navbar-brand"
-           href="{% url 'dashboard' %}">
-            📚 Library Management
+{% if user.is_authenticated %}
+<div class="app">
+    <aside class="sidebar d-none d-lg-flex">
+        <a class="brand" href="{% url 'dashboard' %}">
+            <span class="brand-mark"><i class="bi bi-book-half"></i></span>
+            <span class="brand-name">Athenaeum<small>LIBRARY MANAGEMENT</small></span>
         </a>
-
-        {% if user.is_authenticated %}
-
-        <div>
-
-            <a href="{% url 'dashboard' %}"
-               class="btn btn-outline-light btn-sm">
-                Dashboard
-            </a>
-
-            <a href="{% url 'book_list' %}"
-               class="btn btn-outline-light btn-sm">
-                Books
-            </a>
-
-            <a href="{% url 'member_list' %}"
-               class="btn btn-outline-light btn-sm">
-                Members
-            </a>
-
-            <a href="{% url 'issue_list' %}"
-               class="btn btn-outline-light btn-sm">
-                Issues
-            </a>
-
-            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        <div class="nav-label">Overview</div>
+        <a href="{% url 'dashboard' %}" class="side-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="{% url 'book_list' %}" class="side-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}"><i class="bi bi-journal-bookmark-fill"></i> Books</a>
+        <a href="{% url 'issue_list' %}" class="side-link {% if 'issue' in request.resolver_match.url_name %}active{% endif %}"><i class="bi bi-arrow-left-right"></i> Circulation</a>
+        <div class="nav-label">Catalog</div>
+        <a href="{% url 'author_list' %}" class="side-link {% if 'author' in request.resolver_match.url_name %}active{% endif %}"><i class="bi bi-pen-fill"></i> Authors</a>
+        <a href="{% url 'category_list' %}" class="side-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}"><i class="bi bi-tags-fill"></i> Categories</a>
+        <a href="{% url 'member_list' %}" class="side-link {% if 'member' in request.resolver_match.url_name %}active{% endif %}"><i class="bi bi-people-fill"></i> Members</a>
+        <div class="nav-label">Actions</div>
+        <a href="{% url 'book_create' %}" class="side-link"><i class="bi bi-plus-circle-fill"></i> Add Book</a>
+        <a href="{% url 'issue_book' %}" class="side-link"><i class="bi bi-bookmark-plus-fill"></i> Issue Book</a>
+        <div class="sidebar-footer d-flex align-items-center gap-2">
+            <span class="avatar">{{ user.username|slice:":1"|upper }}</span>
+            <div class="flex-grow-1" style="min-width:0">
+                <div class="text-white fw-bold text-truncate" style="font-size:.9rem">{{ user.get_full_name|default:user.username }}</div>
+                <div style="font-size:.75rem;color:#a5b4fc">Librarian</div>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
-
-                <button type="submit"
-                        class="btn btn-danger btn-sm">
-                    Logout
-                </button>
+                <button type="submit" class="btn btn-sm btn-light" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
             </form>
-
         </div>
-
-        {% endif %}
-
+    </aside>
+    <div class="main">
+        <div class="mobile-nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'book_list' %}">Books</a>
+            <a href="{% url 'issue_list' %}">Issues</a>
+            <a href="{% url 'author_list' %}">Authors</a>
+            <a href="{% url 'category_list' %}">Categories</a>
+            <a href="{% url 'member_list' %}">Members</a>
+        </div>
+        <div class="topbar">
+            <div class="topbar-inner">
+                <div>
+                    <p class="page-sub">{% now "l, F j, Y" %}</p>
+                    <h1 class="page-title">{% block header %}Welcome back, {{ user.first_name|default:user.username }} 👋{% endblock %}</h1>
+                </div>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <a href="{% url 'issue_book' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i> Issue Book</a>
+                    <span class="badge bg-light text-dark border d-none d-md-inline"><i class="bi bi-clock me-1"></i>{% now "h:i A" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="content-wrap">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0" role="alert">
+                    <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'error' %}bi-exclamation-triangle-fill{% elif message.tags == 'warning' %}bi-exclamation-circle-fill{% else %}bi-info-circle-fill{% endif %} me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% block content %}{% endblock %}
+            <p class="text-center text-muted mt-5 mb-1" style="font-size:.8rem">Athenaeum Library System · Crafted for librarians</p>
+        </div>
     </div>
-
-</nav>
-
-
-<div class="container mt-4">
-
-    {% for message in messages %}
-
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-
-    {% endfor %}
-
-    {% block content %}
-
-    {% endblock %}
-
 </div>
-
-
+{% else %}
+    {% for message in messages %}
+        <div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index:1050">
+            <div class="alert alert-{{ message.tags }} shadow border-0">{{ message }}</div>
+        </div>
+    {% endfor %}
+    {% block public_content %}{% endblock %}
+{% endif %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
